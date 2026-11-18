@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ meta.singular }} details{% endblock %}
+{% block content %}
+<a class="back-link" href="{{ url_for('record_list', section=section) }}">← {{ meta.label }}</a>
+<header class="page-heading">
+  <div><h1>{{ values.get(meta.primary) or options.get('job_id', {}).get(values.get('job_id')) or meta.singular }}</h1><p>{{ meta.singular }} details</p></div>
+  <div class="actions">
+    <a class="button secondary danger-link" href="{{ url_for('record_delete', section=section, record_id=record_id) }}">Delete</a>
+    <a class="button" href="{{ url_for('record_form', section=section, record_id=record_id) }}">Edit {{ meta.singular|lower }}</a>
+  </div>
+</header>
+<dl class="panel details">
+  {% for item in meta.fields %}
+    {% set value = values[item.key] %}
+    <div {% if item.kind in ('json', 'textarea', 'skills') %}class="wide"{% endif %}>
+      <dt>{{ item.label }}</dt>
+      <dd>
+        {% if item.kind == 'checkbox' %}{{ 'Yes' if value else 'No' }}
+        {% elif not value %}<span class="muted">—</span>
+        {% elif item.kind == 'relation' %}<a href="{{ url_for('record_detail', section=item.parent, record_id=value|int) }}">{{ options[item.key].get(value, value) }}</a>
+        {% elif item.kind == 'json' %}<pre>{{ value }}</pre>
+        {% elif item.kind == 'number' %}${{ '{:,}'.format(value|int) }}
+        {% elif item.key == 'status' %}<span class="status status-{{ value|lower }}">{{ value }}</span>
+        {% else %}{{ value }}{% endif %}
+      </dd>
+    </div>
+  {% endfor %}
+</dl>
+{% endblock %}

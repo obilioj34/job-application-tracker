@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Delete {{ meta.singular|lower }}{% endblock %}
+{% block content %}
+{% set cancel = url_for('record_detail', section=section, record_id=record_id) %}
+<a class="back-link" href="{{ cancel }}">← Details</a>
+<header class="page-heading"><h1>Delete {{ meta.singular|lower }}</h1></header>
+<form method="post" class="panel confirmation">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <p>Delete <strong>{{ name or ('application #' ~ record_id) }}</strong>? This action is permanent.</p>
+  {% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+  <div class="actions"><button class="button danger" type="submit">Delete {{ meta.singular|lower }}</button><a class="button secondary" href="{{ cancel }}">Cancel</a></div>
+</form>
+{% endblock %}

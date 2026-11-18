@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Overview{% endblock %} | Job Tracker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="site-header">
+    <div class="site-nav">
+      <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-icon" aria-hidden="true">↗</span> Job Tracker</a>
+      <nav aria-label="Main navigation">
+        <a href="{{ url_for('dashboard') }}"{% if request.endpoint == 'dashboard' %} aria-current="page"{% endif %}>Overview</a>
+        {% for key, item in sections.items() %}
+          <a href="{{ url_for('record_list', section=key) }}"{% if section == key %} aria-current="page"{% endif %}>{{ item.label }}</a>
+        {% endfor %}
+        <a href="{{ url_for('job_match') }}"{% if request.endpoint == 'job_match' %} aria-current="page"{% endif %}>Job Match</a>
+      </nav>
+    </div>
+  </header>
+  <main id="content" class="shell">
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+      <div class="notice {{ category }}" role="status">{{ message }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

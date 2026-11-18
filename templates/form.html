@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% set heading = ('Edit ' if record_id else 'Add ') ~ meta.singular|lower %}
+{% set cancel = url_for('record_detail', section=section, record_id=record_id) if record_id else url_for('record_list', section=section) %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<a class="back-link" href="{{ cancel }}">← {{ 'Details' if record_id else meta.label }}</a>
+<header class="page-heading"><div><h1>{{ heading }}</h1><p>Fields marked * are required.</p></div></header>
+<form method="post" class="panel edit-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  {% if errors %}<div class="notice error" role="alert">{{ errors.get('form', 'Check the highlighted fields.') }}</div>{% endif %}
+  <div class="form-grid">
+    {% for item in meta.fields %}
+      {% set key = item.key %}
+      {% set wide = item.kind in ('textarea', 'skills', 'json') %}
+      <div class="field{% if wide %} wide{% endif %}">
+        {% if item.kind == 'checkbox' %}
+        <label class="checkbox"><input name="{{ key }}" type="checkbox" value="1"{% if values[key] %} checked{% endif %}> {{ item.label }}</label>
+        {% else %}
+        <label for="{{ key }}">{{ item.label }}{% if item.required %} *{% endif %}</label>
+        {% set invalid = (' aria-invalid="true" aria-describedby="' ~ key ~ '-error"')|safe if errors.get(key) else '' %}
+        {% if item.kind in ('select', 'relation') %}
+          <select id="{{ key }}" name="{{ key }}"{{ invalid }}{% if item.required %} required{% endif %}>
+            <option value="">Choose {{ item.label|lower }}</option>
+            {% set choices = options[key].items() if item.kind == 'relation' else choice_pairs(item.choices) %}
+            {% for id, label in choices %}
+              <option value="{{ id }}"{% if values[key] == id %} selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          {% if item.kind == 'relation' and not options[key] %}
+            <small><a href="{{ url_for('record_form', section=item.parent) }}">Add {{ sections[item.parent].singular|lower }}</a> to continue.</small>
+          {% endif %}
+        {% elif wide %}
+          <textarea id="{{ key }}" name="{{ key }}" rows="{{ 6 if item.kind == 'json' else 3 }}" maxlength="{{ item.limit }}"{{ invalid }}{% if item.kind == 'json' %} class="code-input"{% endif %}>{{ values[key] }}</textarea>
+          {% if item.kind == 'skills' %}<small>Separate skills with commas or new lines, such as Python, SQL, Flask.</small>{% endif %}
+          {% if item.kind == 'json' %}<small>Optional JSON object, such as <code>{"round": "Phone screen"}</code>.</small>{% endif %}
+        {% else %}
+          <input id="{{ key }}" name="{{ key }}" type="{{ item.kind }}" value="{{ values[key] }}"{{ invalid }}{% if item.required %} required{% endif %}{% if item.limit %} maxlength="{{ item.limit }}"{% endif %}{% if item.kind == 'number' %} min="0" max="2147483647" step="1"{% endif %}>
+        {% endif %}
+        {% endif %}
+        {% if errors.get(key) %}<small class="field-error" id="{{ key }}-error">{{ errors[key] }}</small>{% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  <div class="actions form-actions"><button class="button" type="submit">Save {{ meta.singular|lower }}</button><a class="button secondary" href="{{ cancel }}">Cancel</a></div>
+</form>
+{% endblock %}

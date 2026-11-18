@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ meta.label }}{% endblock %}
+{% block content %}
+<header class="page-heading">
+  <div><h1>{{ meta.label }}</h1><p>{{ meta.description }}</p></div>
+  <a class="button" href="{{ url_for('record_form', section=section) }}">+ Add {{ meta.singular|lower }}</a>
+</header>
+{% if records %}
+<div class="table-wrap" tabindex="0" role="region" aria-label="{{ meta.label }} table">
+  <table>
+    <thead><tr>
+      {% for key, label in meta.columns %}<th scope="col">{{ label }}</th>{% endfor %}
+      <th scope="col">Actions</th>
+    </tr></thead>
+    <tbody>
+    {% for record in records %}
+      {% set record_id = record[id_key] %}
+      <tr>
+        {% for key, label in meta.columns %}
+          {% if loop.first %}
+            <th scope="row"><a href="{{ url_for('record_detail', section=section, record_id=record_id) }}">{{ record[key] }}</a></th>
+          {% else %}
+            <td>{% if key == 'status' %}<span class="status status-{{ record[key]|lower }}">{{ record[key] }}</span>{% else %}{{ record[key] or '—' }}{% endif %}</td>
+          {% endif %}
+        {% endfor %}
+        <td><div class="row-actions">
+          <a href="{{ url_for('record_form', section=section, record_id=record_id) }}" aria-label="Edit {{ record[meta.primary] }}">Edit</a>
+          <a class="danger-link" href="{{ url_for('record_delete', section=section, record_id=record_id) }}" aria-label="Delete {{ record[meta.primary] }}">Delete</a>
+        </div></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="panel empty"><h2>No {{ meta.label|lower }} yet</h2><p>Use the add button to create your first record.</p></div>
+{% endif %}
+{% endblock %}

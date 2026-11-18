@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Job Match{% endblock %}
+{% block content %}
+<header class="page-heading"><div><h1>Job Match</h1><p>Compare your skills with the requirements from your saved jobs.</p></div></header>
+<form method="post" class="panel match-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="field">
+    <label for="skills">Your skills</label>
+    <textarea id="skills" name="skills" rows="3" placeholder="Python, SQL, Flask" aria-describedby="skill-help{% if error %} skill-error{% endif %}" maxlength="4000" required{% if error %} aria-invalid="true"{% endif %}>{{ skills }}</textarea>
+    <small id="skill-help">Separate skills with commas or new lines.</small>
+    {% if error %}<small class="field-error" id="skill-error" role="alert">{{ error }}</small>{% endif %}
+  </div>
+  <button class="button" type="submit">Find matches</button>
+</form>
+
+{% if results is not none %}
+<section class="results">
+  <h2>Matching jobs</h2>
+  {% for result in results %}
+    <article class="panel match-card">
+      <div class="section-heading">
+        <div>
+          <h3><a href="{{ url_for('record_detail', section='jobs', record_id=result.job.job_id) }}">{{ result.job.job_title }}</a></h3>
+          <p class="muted">{{ result.job.company_name }}</p>
+        </div>
+        {% if result.percent is not none %}<span class="score">{{ result.percent }}%</span>{% endif %}
+      </div>
+      {% if result.total %}
+        <p class="match-count">{{ result.matched|length }} of {{ result.total }} required skills matched</p>
+        <meter min="0" max="{{ result.total }}" value="{{ result.matched|length }}" aria-label="Required skills matched"></meter>
+        <div class="match-skills">
+          {% if result.matched %}<p><strong>Matched</strong> {{ result.matched|join(', ') }}</p>{% endif %}
+          {% if result.missing %}<p><strong>Missing</strong> {{ result.missing|join(', ') }}</p>{% endif %}
+        </div>
+      {% else %}<p class="muted">No required skills listed.</p>{% endif %}
+    </article>
+  {% else %}
+    <p class="panel">Add a job with required skills to see a match.</p>
+  {% endfor %}
+</section>
+{% endif %}
+{% endblock %}

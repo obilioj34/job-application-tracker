@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div><h1>Application overview</h1><p>See where your search stands and what’s in motion.</p></div>
+  <a class="button light" href="{{ url_for('record_form', section='applications') }}">+ New application</a>
+</section>
+
+<div class="stats" aria-label="Record totals">
+  {% for key in ('applications', 'jobs', 'companies', 'contacts') %}
+    <a class="stat" href="{{ url_for('record_list', section=key) }}">
+      <span>{{ sections[key].label }}</span><strong>{{ counts[key] }}</strong><span class="stat-arrow" aria-hidden="true">↗</span>
+    </a>
+  {% endfor %}
+</div>
+
+<div class="dashboard-grid">
+  <section class="panel">
+    <h2>Application pipeline</h2>
+    {% for status, total in by_status.items() %}
+      <div class="pipeline-row">
+        <span>{{ status }}</span>
+        <meter min="0" max="{{ counts.applications or 1 }}" value="{{ total }}" aria-label="{{ status }} share"></meter>
+        <strong>{{ total }}</strong>
+      </div>
+    {% endfor %}
+  </section>
+  <section class="panel">
+    <div class="section-heading">
+      <h2>Recent applications</h2>
+      <a href="{{ url_for('record_list', section='applications') }}">View all</a>
+    </div>
+    {% for record in recent %}
+      <div class="recent-row">
+        <div class="recent-main"><a href="{{ url_for('record_detail', section='applications', record_id=record.application_id) }}">{{ record.job_title }}</a><span>{{ record.company_name }} · {{ record.application_date }}</span></div>
+        <span class="status status-{{ record.status|lower }}">{{ record.status }}</span>
+      </div>
+    {% else %}
+      <p class="muted">New applications will appear here.</p>
+    {% endfor %}
+  </section>
+</div>
+{% endblock %}
