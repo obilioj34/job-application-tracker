@@ -6,9 +6,11 @@ I used ChatGPT through Codex to help build the Job Application Tracker. I provid
 
 ## Key prompts
 
-- “help me with my school project as If I was doing it”
-- “Build a complete web application that helps users track their job applications. You will use MySQL for the database, Python with Flask for the backend, and HTML/CSS for the frontend.”
-- I also asked for CRUD on all four tables, a skill match feature, thorough testing, and setup instructions for someone who clones the GitHub repository.
+“Using my course specification, write a MySQL schema for companies, jobs, applications, and contacts. Include the foreign keys and the JSON columns for job requirements and interview details.”
+“Help me build Flask routes to add, list, view, edit, and delete records in all four tables. Show me how to validate the forms and ask for confirmation before deleting a record.”
+“Help me build the dashboard and HTML templates. Show application counts by status, and use the same layout and navigation across the pages.”
+“Write a Python function that compares the skills I enter with each job’s required_skills list. Ignore capitalization and duplicates, rank jobs by percentage, and show which skills are missing.”
+“Help me test the app from a fresh clone using MySQL. Check all four CRUD sections, invalid form inputs, and the expected 100% and 67% Job Match results. Write setup instructions my instructor can follow.”
 
 ## What worked well
 
